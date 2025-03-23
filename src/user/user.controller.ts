@@ -7,45 +7,24 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDTO } from 'src/interface/user/create_user.interface';
+import { AuthService } from '../auth/auth.service';
 import * as bcrypt from 'bcryptjs';
-import { AuthUserDTO } from 'src/interface/user/auth_user.interface';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('login')
-  async login(@Body() { email, password }: AuthUserDTO) {
+  async login(
+    @Body() { email, password }: { email: string; password: string },
+  ) {
     try {
-      if (!email || !password) {
-        throw new BadRequestException(
-          'Os dados enviados estão incompletos! Tente novamente.',
-        );
-      }
-
-      const user = await this.userService.findByEmail(email);
-
-      if (!user) {
-        throw new UnauthorizedException(
-          'Credenciais inváldas! Tente novamente.',
-        );
-      }
-
-      const isPasswordMatching = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordMatching) {
-        throw new UnauthorizedException(
-          'Credenciais inváldas! Tente novamente.',
-        );
-      }
-
-      return { message: 'Usuário logado com sucesso!', user };
+      return this.authService.login(email, password);
     } catch (error) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof UnauthorizedException
-      ) {
+      if (error instanceof UnauthorizedException) {
         throw error;
       }
 
@@ -56,18 +35,16 @@ export class UserController {
   }
 
   @Post('register')
-  async register(@Body() { email, isAdmin, name, password }: CreateUserDTO) {
+  async register(@Body() { email, isAdmin, name, password }: any) {
     try {
       if (!email || !name || !password) {
-        throw new BadRequestException(
-          'Os dados enviados estão incompletos! Tente novamente.',
-        );
+        throw new BadRequestException('Dados incompletos! Tente novamente.');
       }
 
       const isThereUser = await this.userService.findByEmail(email);
 
       if (isThereUser) {
-        throw new BadRequestException('Usuário já cadastrado com este email!');
+        throw new BadRequestException('Email já cadastrado! Tente novamente.');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
