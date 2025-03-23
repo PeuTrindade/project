@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
       entities: [__dirname + '/database/core/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
