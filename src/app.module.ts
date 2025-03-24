@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DestinationModule } from './destination/destination.module';
+import { BetTypeModule } from './bet-type/bet-type.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DestinationModule } from './destination/destination.module';
     UserModule,
     AuthModule,
     DestinationModule,
+    BetTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
